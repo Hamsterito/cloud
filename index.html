@@ -16,4 +16,17 @@
     <h1>Эмоциональная  характеристика</h1>
     <p id="responseMessage"></p>
 </body>
+<script>
+        document.getElementById('feedbackForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const review = document.getElementById('reviewText').value;
+        const response = await fetch('<ВАШ API URL>', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ review })
+        });
+        const result = await response.json();
+        document.getElementById('responseMessage').innerText = 'Спасибо за отзыв!';
+    });
+</script>
 </html>
