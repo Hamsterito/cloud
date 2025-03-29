@@ -18,7 +18,7 @@ def lambda_handler(event, context):
                     'Access-Control-Allow-Methods': 'POST, OPTIONS',
                     'Access-Control-Allow-Headers': 'Content-Type'
                 },
-                'body': json.dumps({'error': 'Review text is required'})
+                'body': json.dumps({'error': 'Review text nope'})
             }
 
         sentiment_response = comprehend.detect_sentiment(Text=review_text, LanguageCode='en')
