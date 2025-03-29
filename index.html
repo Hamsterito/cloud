@@ -29,7 +29,7 @@
             }
 
             try {
-                const response = await fetch('https://addb2b8ffb.execute-api.eu-north-1.amazonaws.com/prod', {
+                const response = await fetch('https://addb2b8ffb.execute-api.eu-north-1.amazonaws.com/prod/feedback', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ review })
