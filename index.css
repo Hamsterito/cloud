@@ -1,0 +1,19 @@
+#reviewText {
+    width: 600px;
+    height: 200px;
+    font-size: 16px;
+}
+
+#btn {
+    margin-top: 10px;
+    width: 150px;
+    height: 50px;
+    border: 1px solid;
+    border-radius: 12px;
+}
+
+#responseMessage{
+    width: 600px;
+    height: 200px;
+    border: 1px solid;
+}
