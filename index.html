@@ -17,38 +17,29 @@
     <p id="responseMessage"></p>
 </body>
 <script>
-    document.getElementById('feedbackForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        
-        const review = document.getElementById('reviewText').value.trim();
-        const responseMessage = document.getElementById('responseMessage');
-
-        if (!review) {
-            responseMessage.innerText = 'Пожалуйста, введите отзыв перед отправкой.';
-            return;
-        }
-
-        try {
-            const response = await fetch('https://addb2b8ffb.execute-api.eu-north-1.amazonaws.com/prod/feedback', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ review })
-            });
-
-            if (!response.ok) throw new Error('Ошибка при получении ответа от сервера.');
-
-            const result = await response.json();
+     document.getElementById("feedbackForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
             
-            console.log('Server response:', result);
-
-            if (result.sentiment) {
-                responseMessage.innerText = `Спасибо за отзыв! Настроение: ${result.sentiment}`;
-            } else {
-                responseMessage.innerText = 'Ошибка: Не удалось определить настроение.';
+            const reviewText = document.getElementById("reviewText").value;
+            if (!reviewText) {
+                alert("Введите отзыв.");
+                return;
             }
-        } catch (error) {
-            responseMessage.innerText = `Ошибка: ${error.message}`;
-        }
-    });
+            
+            try {
+                const response = await fetch('https://your-api-gateway-url.amazonaws.com/dev/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ review: reviewText })
+                });
+                
+                const data = await response.json();
+                document.getElementById("responseMessage").innerText = data.sentiment 
+                    ? `Эмоция: ${data.sentiment}` 
+                    : "Ошибка при обработке отзыва.";
+            } catch (error) {
+                document.getElementById("responseMessage").innerText = "Ошибка соединения с сервером.";
+            }
+        });
 </script>
 </html>
