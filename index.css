@@ -22,6 +22,10 @@ textarea {
     border-radius: 12px;
 }
 
+#btn:hover {
+    background-color: #e7e6e6;
+}
+
 #responseMessage{
     width: 600px;
     height: 200px;
