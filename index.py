@@ -3,33 +3,21 @@ import boto3
 import uuid
 
 dynamodb = boto3.client('dynamodb')
-comprehend = boto3.client('comprehend')
+comprehend = boto3.client('comprehend', region_name='eu-west-2')
 
 def lambda_handler(event, context):
     try:
-        if event.get('httpMethod') == 'OPTIONS':
-            return {
-                'statusCode': 200,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type'
-                },
-                'body': json.dumps({'message': 'CORS preflight response'})
-            }
-
-        body = json.loads(event.get('body', '{}'))
+        if 'body' in event:
+            body = json.loads(event.get('body', '{}'))
+        else:
+            body = event
+        
         review_text = body.get('review')
 
         if not review_text:
             return {
                 'statusCode': 400,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type'
-                },
-                'body': json.dumps({'error': 'Review text - nope'})
+                'body': json.dumps({'error': 'Review text is missing'})
             }
 
         sentiment_response = comprehend.detect_sentiment(Text=review_text, LanguageCode='en')
@@ -47,22 +35,11 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': 200,
-            'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type'
-            },
             'body': json.dumps({'reviewId': review_id, 'sentiment': sentiment})
         }
 
     except Exception as e:
-        print(f"Error: {str(e)}")
         return {
             'statusCode': 500,
-            'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type'
-            },
             'body': json.dumps({'error': str(e)})
         }
