@@ -6,23 +6,51 @@ dynamodb = boto3.client('dynamodb')
 comprehend = boto3.client('comprehend')
 
 def lambda_handler(event, context):
-    body = json.loads(event['body'])
-    review_text = body['review']
-    
-    sentiment_response = comprehend.detect_sentiment(Text=review_text, LanguageCode='en')
-    sentiment = sentiment_response['Sentiment']
+    try:
+        body = json.loads(event['body'])
+        review_text = body.get('review', '')
 
-    review_id = str(uuid.uuid4())
-    dynamodb.put_item(
-        TableName='Feedbacks',
-        Item={
-            'reviewId': {'S': review_id},
-            'reviewText': {'S': review_text},
-            'sentiment': {'S': sentiment}
+        if not review_text:
+            return {
+                'statusCode': 400,
+                'headers': {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type'
+                },
+                'body': json.dumps({'error': 'Review text is required'})
+            }
+
+        sentiment_response = comprehend.detect_sentiment(Text=review_text, LanguageCode='en')
+        sentiment = sentiment_response['Sentiment']
+
+        review_id = str(uuid.uuid4())
+        dynamodb.put_item(
+            TableName='Feedbacks',
+            Item={
+                'reviewId': {'S': review_id},
+                'reviewText': {'S': review_text},
+                'sentiment': {'S': sentiment}
+            }
+        )
+
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type'
+            },
+            'body': json.dumps({'reviewId': review_id, 'sentiment': sentiment})
         }
-    )
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps({'reviewId': review_id, 'sentiment': sentiment})
-    }
+    
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type'
+            },
+            'body': json.dumps({'error': str(e)})
+        }
